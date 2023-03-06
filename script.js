@@ -18,6 +18,8 @@ fetch("http://localhost:3000/users")
 function printUsers(users) {
     console.log(users);
 
+    usersList.innerHTML = "";
+
     users.map(user => {
         let li = document.createElement("li");
         li.id = user.id;
@@ -25,3 +27,29 @@ function printUsers(users) {
         usersList.append(li);
     })
 }
+
+//Send input values to server when user clicks the save button
+saveNewUserBtn.addEventListener("click", () => {
+
+    //Create new user object
+    let user = {username: newUsername.value, password: newPassword.value}; 
+
+    //POST to server
+    fetch("http://localhost:3000/users", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user)
+    })
+    .then(res => res.json())
+
+    //Call function printUsers to add new user to list
+    .then(data => {
+        printUsers(data);
+    });
+
+    newUsername.value = "";
+    newPassword.value = "";
+});
+
