@@ -8,11 +8,19 @@ let loginPassword = document.getElementById("loginPassword");
 let loginUserBtn = document.getElementById("loginUserBtn");
 let logoutUserBtn = document.getElementById("logoutUserBtn");
 let userGreeting = document.getElementById("userGreeting");
+let loggedInUser = localStorage.getItem("username");
 
 //Fetch user data from server and call function printUsers
 fetch("http://localhost:3000/users")
 .then(res => res.json())
-.then(data => printUsers(data));
+.then(data => {
+    printUsers(data);
+});
+
+//If user is logged in, display greeting message
+if(loggedInUser) {
+    userGreeting.innerText = "Hello " + loggedInUser + "!";
+}
 
 //Function to print users in a list
 function printUsers(users) {
@@ -76,7 +84,9 @@ loginUserBtn.addEventListener("click", () => {
         console.log(data);
 
         if(data.name) {
-            userGreeting.innerText = "Hello " + data.name;
+            userGreeting.innerText = "Hello " + data.name + "!";
+            localStorage.setItem("username", data.name);
+            localStorage.setItem("id", data.id);
         }
         else {
             userGreeting.innerText = "Incorrect password or username.";
