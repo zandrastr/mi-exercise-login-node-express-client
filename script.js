@@ -96,3 +96,11 @@ loginUserBtn.addEventListener("click", () => {
     loginUsername.value = "";
     loginPassword.value = "";
 });
+
+//Delete local storage and change greeting message when user clicks the logout button
+logoutUserBtn.addEventListener("click", () => {
+
+    userGreeting.innerText = "You have been logged out.";
+    localStorage.removeItem("username");
+    localStorage.removeItem("id");
+});
