@@ -53,3 +53,29 @@ saveNewUserBtn.addEventListener("click", () => {
     newPassword.value = "";
 });
 
+//Send login input values to server when user clicks the login button
+loginUserBtn.addEventListener("click", () => {
+
+    //Create object with user login input
+    let loginUser = {
+        name: loginUsername.value,
+        password: loginPassword.value
+    }
+
+    //POST to server
+    fetch("http://localhost:3000/users/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginUser)
+    })
+    .then(res => res.json())
+
+    .then(data => {
+        console.log(data);
+    });
+
+    loginUsername.value = "";
+    loginPassword.value = "";
+});
