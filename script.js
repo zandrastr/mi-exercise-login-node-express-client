@@ -71,9 +71,16 @@ loginUserBtn.addEventListener("click", () => {
         body: JSON.stringify(loginUser)
     })
     .then(res => res.json())
-
+    
     .then(data => {
         console.log(data);
+
+        if(data.name) {
+            userGreeting.innerText = "Hello " + data.name;
+        }
+        else {
+            userGreeting.innerText = "Incorrect password or username.";
+        }
     });
 
     loginUsername.value = "";
