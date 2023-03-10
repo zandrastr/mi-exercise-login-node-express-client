@@ -1,106 +1,169 @@
-//Global variables
-let usersList = document.getElementById("usersList");
-let newUsername = document.getElementById("newUsername");
-let newPassword = document.getElementById("newPassword");
-let saveNewUserBtn = document.getElementById("saveNewUserBtn");
-let loginUsername = document.getElementById("loginUsername");
-let loginPassword = document.getElementById("loginPassword");
-let loginUserBtn = document.getElementById("loginUserBtn");
-let logoutUserBtn = document.getElementById("logoutUserBtn");
+//GLOBAL VARIABLES
+let rootHtmlElement = document.getElementById("root");
+let showAllUsersBtn = document.getElementById("showAllUsersBtn");
+let loginUserForm = document.getElementById("loginUserForm");
+let createNewUserForm = document.getElementById("createNewUserForm");
 let userGreeting = document.getElementById("userGreeting");
 let loggedInUser = localStorage.getItem("username");
 
-//Fetch user data from server and call function printUsers
-fetch("http://localhost:3000/users")
-.then(res => res.json())
-.then(data => {
-    printUsers(data);
-});
 
-//If user is logged in, display greeting message
-if(loggedInUser) {
+//RENDER DIFFERENT CONTENT DEPENDING IF USER IS LOGGED IN OR NOT
+if (loggedInUser) {
     userGreeting.innerText = "Hello " + loggedInUser + "!";
-}
+    printLogoutBtn();
+} else {
+    printLoginForm();
+    //printUsers();
+};
 
-//Function to print users in a list
-function printUsers(users) {
-    console.log(users);
-
-    usersList.innerHTML = "";
-
-    users.map(user => {
-        let li = document.createElement("li");
-        li.id = user.id;
-        li.innerText = user.username;
-        usersList.append(li);
-    })
-}
-
-//Send input values to server when user clicks the save button
-saveNewUserBtn.addEventListener("click", () => {
-
-    //Create new user object
-    let user = {username: newUsername.value, password: newPassword.value}; 
-
-    //POST to server
-    fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user)
-    })
-    .then(res => res.json())
-
-    //Call function printUsers to add new user to list
-    .then(data => {
-        printUsers(data);
-    });
-
-    newUsername.value = "";
-    newPassword.value = "";
+//SHOW ALL USERS BUTTON EVENT
+showAllUsersBtn.addEventListener("click", () => {
+    printUsers();
 });
 
-//Send login input values to server when user clicks the login button
-loginUserBtn.addEventListener("click", () => {
 
-    //Create object with user login input
-    let loginUser = {
-        name: loginUsername.value,
-        password: loginPassword.value
-    }
-
-    //POST to server
-    fetch("http://localhost:3000/users/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginUser)
-    })
-    .then(res => res.json())
+//FUNCTION TO PRINT USERS IN A LIST 
+function printUsers() {
     
-    .then(data => {
-        console.log(data);
+    //Fetch user data from server and call function printUsers
+    fetch("http://localhost:3000/users")
+    .then(res => res.json())
+    .then(data => {        
+        
+        let usersList = document.createElement("ul");
+        usersList.innerHTML = "";
+        
+        data.map(user => {
+            let li = document.createElement("li");
+            li.id = user.id;
+            li.innerText = user.username;
+            usersList.append(li);
+        })
+        rootHtmlElement.innerHTML = "";
+        rootHtmlElement.append(usersList);
+    })   
+};
 
-        if(data.name) {
-            userGreeting.innerText = "Hello " + data.name + "!";
-            localStorage.setItem("username", data.name);
-            localStorage.setItem("id", data.id);
+
+//FUNCTION TO CREATE NEW USER FORM
+function printCreateNewUserForm() {
+    let createNewUserHeader = document.createElement("h2");
+    createNewUserHeader.innerText = "Create new user"
+    let createNewUsername = document.createElement("input");
+    createNewUsername.placeholder = "Username";
+    let createNewPassword = document.createElement("input");
+    createNewPassword.placeholder = "Password";
+    let saveNewUserBtn = document.createElement("button");
+    saveNewUserBtn.innerText = "Save";
+
+    //Send input values to server when user clicks the save button
+    saveNewUserBtn.addEventListener("click", () => {
+        createNewUserHeader.innerText = "New user was created!";
+
+        //Create new user object
+        let user = {
+            username: createNewUsername.value, 
+            password: createNewPassword.value
+        };
+
+        //POST to server
+        fetch("http://localhost:3000/users", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(user)
+        })
+        .then(res => res.json())
+
+        //Call function printUsers to add new user to list
+        .then(data => {
+            printUsers(data);
+        });
+    });
+    createNewUsername.value = "";
+    createNewPassword.value = "";
+    createNewUserForm.innerHTML = "";
+    createNewUserForm.append(createNewUserHeader, createNewUsername, createNewPassword, saveNewUserBtn);
+}
+
+
+//FUNCTION TO CREATE LOGIN FORM
+function printLoginForm() {
+    let loginHeader = document.createElement("h2");
+    loginHeader.innerText = "Login"
+    let loginUsername = document.createElement("input");
+    loginUsername.placeholder = "Username";
+    let loginPassword = document.createElement("input");
+    loginPassword.placeholder = "Password";
+    let loginBtn = document.createElement("button");
+    loginBtn.innerText = "Login";
+    let loginGreeting = document.createElement("h3");
+
+    //Send login input values to server when user clicks the login button
+    loginBtn.addEventListener("click", () => {
+
+        //Create object with user login input
+        let loginUser = {
+            name: loginUsername.value,
+            password: loginPassword.value
         }
-        else {
-            userGreeting.innerText = "Incorrect password or username.";
-        }
+
+        //POST to server
+        fetch("http://localhost:3000/users/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(loginUser)
+        })
+        .then(res => res.json())
+        
+        .then(data => {
+            if(data.name) {
+                userGreeting.innerText = "Hello " + data.name + "!";
+
+                //Save info in local storage
+                localStorage.setItem("username", data.name);
+                localStorage.setItem("id", data.id);
+
+                createNewUserForm.innerHTML = "";
+                printLogoutBtn();
+            }
+            else {
+                userGreeting.innerText = "Incorrect password or username.";
+                printLoginForm();
+                printCreateNewUserForm();
+            }
+        });
+    });
+    printCreateNewUserForm();
+    loginUserForm.innerHTML = "";
+    loginUserForm.append(loginHeader, loginUsername, loginPassword, loginBtn, loginGreeting);
+};
+
+
+//FUNCTION TO CREATE LOGOUT BUTTON
+function printLogoutBtn() {
+    let logoutBtn = document.createElement("button");
+    logoutBtn.innerText = "Logout";
+    let logoutGreeting = document.createElement("h3"); 
+    
+    //Delete local storage and show logout message when user clicks the logout button
+    logoutBtn.addEventListener("click", () => {
+        userGreeting.innerText = "";
+        userGreeting.innerText = "You have been logged out.";
+
+        localStorage.removeItem("username");
+        localStorage.removeItem("id");
+
+        printLoginForm();
+        printCreateNewUserForm();
     });
 
-    loginUsername.value = "";
-    loginPassword.value = "";
-});
+    loginUserForm.innerHTML = "";
+    loginUserForm.append(logoutGreeting);
+    loginUserForm.append(logoutBtn);
+}
 
-//Delete local storage and change greeting message when user clicks the logout button
-logoutUserBtn.addEventListener("click", () => {
 
-    userGreeting.innerText = "You have been logged out.";
-    localStorage.removeItem("username");
-    localStorage.removeItem("id");
-});

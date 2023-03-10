@@ -9,26 +9,21 @@
 </head>
 <body>
 
-    <h1>Welcome!</h1>
+    <header>
+        <h1>Welcome!</h1>
+        <button id="showAllUsersBtn">Show all users</button>
+        <h2 id="userGreeting"></h2>
+    </header>
+
+    <div id="root"></div>
     
-    <ul id="usersList"></ul>
-    
-    <div>
-        <h2>Create a new user</h2>
-        <input type="text" id="newUsername" placeholder="Username">
-        <input type="text" id="newPassword" placeholder="Password">
-        <button id="saveNewUserBtn">Save</button>
-    </div>
-    
-    <div>
-        <h2>Login</h2>
-        <input type="text" id="loginUsername" placeholder="Username">
-        <input type="text" id="loginPassword" placeholder="Password">
-        <button id="loginUserBtn">Login</button>
-        <button id="logoutUserBtn">Logout</button>
-    </div>
-    
-    <h2 id="userGreeting"></h2>
+    <section class="userFormsWrapper">
+        <div id="createNewUserForm"></div>
+        <div id="loginUserForm"></div>
+    </section>
+
+    <footer>Sandra | Medieinstitutet</footer>
 
 </body>
 </html>
+
